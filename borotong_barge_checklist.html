@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barge Engine Checklist · Chinese toggle</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f4f7fb;
+      padding: 2rem 1.5rem;
+      color: #1e2b3c;
+      line-height: 1.5;
+    }
+    .checklist {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      padding: 2rem 2.2rem 2.5rem;
+    }
+
+    /* header */
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+      color: #0b2a45;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+    .subhead {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #4a627a;
+      margin-bottom: 2rem;
+      border-left: 4px solid #9bb7d4;
+      padding-left: 1rem;
+    }
+
+    /* master toggle area */
+    .toggle-panel {
+      background: #ecf3fa;
+      border-radius: 18px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2rem;
+      border: 1px solid #cdddec;
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      font-weight: 500;
+      color: #1e3b5c;
+      user-select: none;
+    }
+    .toggle-item input[type="checkbox"] {
+      width: 1.3rem;
+      height: 1.3rem;
+      cursor: pointer;
+      accent-color: #2a6f97;
+      margin: 0;
+    }
+    .trace-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: white;
+      padding: 0.3rem 0.9rem 0.3rem 0.9rem;
+      border-radius: 40px;
+      border: 1px solid #b6cee6;
+      transition: all 0.2s;
+      opacity: 1;
+    }
+    .trace-toggle.hidden {
+      display: none;
+    }
+    .trace-toggle label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      color: #1a3f5e;
+    }
+    .trace-toggle input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      cursor: pointer;
+      accent-color: #2a6f97;
+    }
+    .badge {
+      font-size: 0.7rem;
+      background: #e1eaf3;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      color: #2a4b6e;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      margin-left: 0.2rem;
+    }
+
+    /* sections */
+    .section {
+      margin-top: 2rem;
+      margin-bottom: 1.2rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #0b2a45;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #dbe7f2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.8rem;
+    }
+    .section-title .zh {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #2a4b6e;
+    }
+    .section-title .py {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #6688aa;
+    }
+
+    /* checklist item */
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      border-radius: 14px;
+      transition: background 0.1s;
+      margin-bottom: 0.15rem;
+      border-left: 4px solid transparent;
+    }
+    .item:hover {
+      background: #f6faff;
+      border-left-color: #a0c1dd;
+    }
+    .item input[type="checkbox"] {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-top: 0.2rem;
+      flex-shrink: 0;
+      cursor: pointer;
+      accent-color: #1e6f9f;
+    }
+    .item-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .en-line {
+      font-weight: 500;
+      color: #152f44;
+      font-size: 1.05rem;
+    }
+    .zh-line {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #1b4a6e;
+      font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+      letter-spacing: 0.01em;
+      line-height: 1.4;
+    }
+    .py-line {
+      font-size: 0.9rem;
+      color: #5b7d9e;
+      font-style: italic;
+      letter-spacing: 0.2px;
+      font-weight: 400;
+    }
+
+    /* hidden helper – controlled by JS class */
+    .hide-zh .zh-line,
+    .hide-zh .py-line,
+    .hide-zh .section-title .zh,
+    .hide-zh .section-title .py {
+      display: none;
+    }
+
+    /* trace-over effect (simulated) */
+    .trace-over .zh-line {
+      background: linear-gradient(145deg, #fff8e0, #fff2cc);
+      box-shadow: inset 0 0 0 1px #ebd6a8, 0 2px 4px rgba(0,0,0,0.02);
+      border-radius: 8px;
+      padding: 0.15rem 0.7rem 0.15rem 0.7rem;
+      display: inline-block; /* keeps background tight */
+      transition: background 0.2s, box-shadow 0.2s;
+      border-left: 3px solid #c9a54b;
+      font-weight: 550;
+      color: #2e2b1f;
+    }
+
+    /* trace toggle hidden state */
+    .trace-toggle.hidden {
+      display: none;
+    }
+
+    /* small spacing */
+    .spacer {
+      height: 0.5rem;
+    }
+
+    /* for section titles that appear with zh/py inline */
+    .section-title .en {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    /* no chinese mode – section titles still show english */
+    .hide-zh .section-title .en {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="checklist" id="checklistApp">
+  <!-- Header -->
+  <h1>
+    Barge Engine & Generator Daily Checklist
+    <span class="badge" id="langBadge">EN + 中文</span>
+  </h1>
+  <div class="subhead" id="subheadZh">
+    <span class="en">fādòngjī hé fādiàn jī měi rì jiǎnchá qīngdān</span><br>
+    <span class="zh" style="font-size:1.2rem; font-weight:500;">发动机和发电机每日检查清单</span>
+  </div>
+
+  <!-- Master toggle + trace toggle -->
+  <div class="toggle-panel">
+    <label class="toggle-item">
+      <input type="checkbox" id="showChineseCheckbox" checked>
+      <span>Show Chinese & Pinyin</span>
+    </label>
+    <div class="trace-toggle" id="traceToggleWrapper">
+      <label>
+        <input type="checkbox" id="traceOverCheckbox">
+        <span>✍️ Trace over Chinese (after sample)</span>
+      </label>
+    </div>
+    <span style="font-size:0.85rem; color:#3d5e7a; margin-left:auto;">
+      ⓘ sample strokes available
+    </span>
+  </div>
+
+  <!-- BEFORE STARTING section -->
+  <div class="section">
+    <div class="section-title">
+      <span class="en">Before starting</span>
+      <span class="py">Qǐdòng qián</span>
+      <span class="zh">启动前</span>
+    </div>
+
+    <!-- items -->
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check engine oil level</span>
+        <span class="py-line">jiǎnchá fādòngjī yóu wèi</span>
+        <span class="zh-line">检查发动机油位</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check coolant level</span>
+        <span class="py-line">Jiǎnchá lěngquè yè yè wèi</span>
+        <span class="zh-line">检查冷却液液位</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check fuel level</span>
+        <span class="py-line">Jiǎnchá rányóu yè wèi</span>
+        <span class="zh-line">检查燃油液位</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Drain/check fuel-water separator</span>
+        <span class="py-line">Páifàng/jiǎnchá rányóu-shuǐ fèn lí qì</span>
+        <span class="zh-line">排放/检查燃油-水分离器</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check fuel lines</span>
+        <span class="py-line">Jiǎnchá rányóu guǎn lù</span>
+        <span class="zh-line">检查燃油管路</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check for oil/fuel/coolant leaks</span>
+        <span class="py-line">Jiǎnchá yóu/rányóu/lěngquè yè xièlòu</span>
+        <span class="zh-line">检查油/燃油/冷却液泄漏</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check belts</span>
+        <span class="py-line">Jiǎnchá pídài</span>
+        <span class="zh-line">检查皮带</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check hoses and clamps</span>
+        <span class="py-line">Jiǎnchá ruǎn guǎn hé kǎ gū</span>
+        <span class="zh-line">检查软管和卡箍</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check batteries</span>
+        <span class="py-line">Jiǎnchá diànchí</span>
+        <span class="zh-line">检查电池</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check battery terminals</span>
+        <span class="py-line">Jiǎnchá diànchí jiēxiàn zhù.</span>
+        <span class="zh-line">检查电池接线柱</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check starting system</span>
+        <span class="py-line">Jiǎnchá qǐdòng xìtǒng</span>
+        <span class="zh-line">检查启动系统</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check seawater intake valve (if applicable)</span>
+        <span class="py-line">Jiǎnchá hǎishuǐ jìn shuǐ fá (rú shìyòng)</span>
+        <span class="zh-line">检查海水进水阀（如适用）</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check seawater strainer</span>
+        <span class="py-line">Jiǎnchá hǎishuǐ lǜqì</span>
+        <span class="zh-line">检查海水滤器</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check raw water pump</span>
+        <span class="py-line">Jiǎnchá yuán shuǐbèng</span>
+        <span class="zh-line">检查原水泵</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check exhaust system</span>
+        <span class="py-line">Jiǎnchá pái qì xìtǒng</span>
+        <span class="zh-line">检查排气系统</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check air filter</span>
+        <span class="py-line">Jiǎnchá kōngqì lǜ qīng qì</span>
+        <span class="zh-line">检查空气滤清器</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check hydraulic oil (if applicable)</span>
+        <span class="py-line">Jiǎnchá yèyā yóu (rú shìyòng)</span>
+        <span class="zh-line">检查液压油（如适用）。</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Confirm emergency stop button is reset and functional</span>
+        <span class="py-line">Quèrèn jǐnjí tíngzhǐ ànniǔ yǐ fùwèi qiě kěyòng</span>
+        <span class="zh-line">确认紧急停止按钮已复位且可用</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Confirm generator circuit breaker is in the correct position before starting</span>
+        <span class="py-line">Qǐdòng qián quèrèn fādiàn jī duànlù qì wèizhì zhèngquè</span>
+        <span class="zh-line">启动前确认发电机断路器位置正确</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER STARTING section -->
+  <div class="section">
+    <div class="section-title">
+      <span class="en">After starting</span>
+      <span class="py">Qǐdòng hòu</span>
+      <span class="zh">启动后</span>
+    </div>
+
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Immediately verify oil pressure</span>
+        <span class="py-line">lìjí quèrèn jīyóu yālì</span>
+        <span class="zh-line">立即确认机油压力</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check coolant temperature</span>
+        <span class="py-line">Jiǎnchá lěngquè yè wēndù</span>
+        <span class="zh-line">检查冷却液温度</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check charging voltage</span>
+        <span class="py-line">Jiǎnchá chōngdiàn diànyā</span>
+        <span class="zh-line">检查充电电压</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check frequency: Should be 50Hz for equipment designed for 50Hz operation.</span>
+        <span class="py-line">Jiǎnchá pínlǜ: Zài chuánbó shèbèi shèjì wèi 60Hz</span>
+        <span class="zh-line">检查频率：在船舶设备设计为 60Hz 时，应为 60Hz。</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check generator voltage</span>
+        <span class="py-line">jiǎnchá fādiàn jī diànyā</span>
+        <span class="zh-line">检查发电机电压</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Listen for abnormal noise/vibration</span>
+        <span class="py-line">Tīng shìfǒu yǒu yìcháng zàoyīn/zhèndòng</span>
+        <span class="zh-line">听是否有异常噪音/振动</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check exhaust</span>
+        <span class="py-line">Jiǎnchá pái qì</span>
+        <span class="zh-line">检查排气</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Confirm cooling water discharge (if applicable)</span>
+        <span class="py-line">Quèrèn lěngquè shuǐ páifàng (rú shìyòng)</span>
+        <span class="zh-line">确认冷却水排放（如适用）</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Check for leaks</span>
+        <span class="py-line">Jiǎnchá xièlòu</span>
+        <span class="zh-line">检查泄漏</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Allow the engine to warm up before applying a heavy load</span>
+        <span class="py-line">Zài shījiā zhòng fùzǎi qián ràng fādòngjī yù rè</span>
+        <span class="zh-line">在施加重负载前让发动机预热</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRAINING EXERCISES section (same toggle behaviour) -->
+  <div class="section">
+    <div class="section-title">
+      <span class="en">Training exercises</span>
+      <span class="py">Xùnliàn yǎnxí</span>
+      <span class="zh">训练演习</span>
+    </div>
+
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Stern tube troubleshooting</span>
+        <span class="py-line">Wěi zhóu guǎn gùzhàng páichá</span>
+        <span class="zh-line">艉轴管故障排查</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Anchor — deployment and retrieval</span>
+        <span class="py-line">Máo —— tóufàng yǔ huíshōu</span>
+        <span class="zh-line">锚 —— 投放与回收</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Ramp — deployment and retrieval ·</span>
+        <span class="py-line">pō dào —— bùshǔ yǔ huíshōu</span>
+        <span class="zh-line">坡道 —— 部署与回收</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Life raft — deployment and retrieval</span>
+        <span class="py-line">jiùshēng fá —— tóufàng yǔ huíshōu</span>
+        <span class="zh-line">救生筏 —— 投放与回收</span>
+      </div>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <div class="item-text">
+        <span class="en-line">Sea trial and maneuver practice</span>
+        <span class="py-line">Hǎishàng shìyàn yǔ cāozòng liànxí</span>
+        <span class="zh-line">海上试验与操纵练习</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const container = document.getElementById('checklistApp');
+    const showChineseCheckbox = document.getElementById('showChineseCheckbox');
+    const traceOverCheckbox = document.getElementById('traceOverCheckbox');
+    const traceToggleWrapper = document.getElementById('traceToggleWrapper');
+    const langBadge = document.getElementById('langBadge');
+    const subheadZh = document.getElementById('subheadZh');
+
+    // Helper: toggle class hide-zh on container (hides all .zh-line, .py-line, and section-title .zh/.py)
+    function updateChineseVisibility() {
+      const showChinese = showChineseCheckbox.checked;
+      if (showChinese) {
+        container.classList.remove('hide-zh');
+        langBadge.textContent = 'EN + 中文';
+      } else {
+        container.classList.add('hide-zh');
+        langBadge.textContent = 'EN only';
+        // When Chinese is hidden, trace-over is irrelevant -> uncheck and hide trace toggle
+        if (traceOverCheckbox.checked) {
+          traceOverCheckbox.checked = false;
+          container.classList.remove('trace-over');
+        }
+      }
+      // Show/hide trace toggle wrapper based on Chinese visibility
+      if (showChinese) {
+        traceToggleWrapper.classList.remove('hidden');
+      } else {
+        traceToggleWrapper.classList.add('hidden');
+      }
+    }
+
+    // Trace-over effect toggling
+    function updateTraceOver() {
+      const traceActive = traceOverCheckbox.checked;
+      if (traceActive && showChineseCheckbox.checked) {
+        container.classList.add('trace-over');
+      } else {
+        container.classList.remove('trace-over');
+      }
+    }
+
+    // Event listeners
+    showChineseCheckbox.addEventListener('change', function() {
+      updateChineseVisibility();
+      updateTraceOver();  // ensures trace class is removed if Chinese hidden
+    });
+
+    traceOverCheckbox.addEventListener('change', updateTraceOver);
+
+    // initial state: show Chinese is checked, trace off
+    updateChineseVisibility();
+    updateTraceOver();
+
+    // Also handle the subhead: the subhead has a .py-line and .zh-line inside a div
+    // It's not inside .item-text but we want it to hide consistently.
+    // We'll add appropriate classes: the subhead contains <span class="en">, <span class="zh">
+    // and a line break. The .zh will be hidden by .hide-zh .zh-line? No, .zh-line is not there.
+    // Better: adjust subhead to use consistent classes.
+    // Let's modify the subhead content manually to include py-line and zh-line, but keep structure.
+    // We can replace the subhead with proper classes for hide-zh.
+    // I'll do a quick update:
+    if (subheadZh) {
+      // Rebuild subhead to match structure: py-line, zh-line etc.
+      subheadZh.innerHTML = `
+        <span class="en">fādòngjī hé fādiàn jī měi rì jiǎnchá qīngdān</span>
+        <span class="py-line" style="display:block; font-style:italic; color:#5b7d9e;">fādòngjī hé fādiàn jī měi rì jiǎnchá qīngdān</span>
+        <span class="zh-line" style="display:block; font-size:1.2rem; font-weight:500;">发动机和发电机每日检查清单</span>
+      `;
+      // The en line originally was "fādòngjī hé fādiàn jī měi rì jiǎnchá qīngdān" but that's pinyin.
+      // We'll keep it clean: the original subhead had pinyin then chinese.
+      // Actually it had: fādòngjī... then 发动机...
+      // For clarity, I will set the first line as Pinyin (class py-line) and second as Chinese (zh-line)
+      // But the original english text is "fādòngjī hé fādiàn jī měi rì jiǎnchá qīngdān" (pinyin) – so fine.
+      // Also add a line with title? The h1 covers English. So we put pinyin and chinese.
+    }
+    // Because the original subhead already had those lines, but we want consistent hiding.
+    // The updated innerHTML ensures .py-line and .zh-line are hidden when hide-zh is active.
+    // Also we need a small fix: the subhead originally had <br>, but we replaced with block spans.
+    // We'll also ensure that when hide-zh is applied, the .en line inside subhead remains.
+    // The .en line is not hidden (only py-line, zh-line). Good.
+  })();
+</script>
+
+<!-- ensure subhead is correctly reworked: we set innerHTML on DOMContentLoaded? It's already executed -->
+<!-- but the script runs after the element, so fine -->
+</body>
+</html>
+```
